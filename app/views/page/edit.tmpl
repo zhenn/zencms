@@ -1,0 +1,283 @@
+<%= include('../public/header') %>
+<%= include('../public/leftbar') %>
+<h2 class="title">编辑数据-<%= data.name %></h2>
+<div class="page-edit" data-templateId="<%= data.id %>">
+    <ul class="list">
+        <%
+            taglist.forEach(function(item, i) {
+        %>
+        <li data-row="<%= item.row %>" data-default-row="<%= item.defaultRow %>">
+            <h3 class="tagNames" data-tagname="<%= item.name %>"><%= item.name %><span class="tips">（默认<%= item.defaultRow %>行，最多<%= item.row %>行）</span></h3>
+            <div class="datas">
+                
+                <%
+                    for (var j = 0; j < item.data.length; j++) {
+                        var v = item.data[j];
+                %>
+                <div class="erow">
+                    <%
+                        
+                        v.forEach(function(val, index) {
+                    %>
+                    <div class="unit"><span class="tit"><p class="field"><%= val.title %>:</span></p> <input type="text" data-field="<%= val.field %>" class="text" value="<%= val.value %>" /></div>
+                    <%
+                        });
+                    %>
+                    <div class="act">
+                        <button class="btn btn-sm delrow" <% if(item.data.length <= item.defaultRow) {print('style="display:none;"')} %>>
+                            <i class="glyphicon glyphicon-trash"></i>
+                            删除
+                        </button>
+                    </div>
+                </div>
+                <%
+                    }
+                %>
+                
+            </div>
+            <div class="actions">
+                <button class="btn btn-sm btn-success save" data-tagid="<%= item.id %>" data-tagtype="<%= item.type %>">
+                    <i class="glyphicon glyphicon-ok-sign"></i>
+                    保存数据
+                </button>
+                
+                <button class="btn btn-sm btn-success add" <%if (item.data.length == item.row) {%>style="display:none;"<%}%>>
+                    <i class="glyphicon glyphicon-ok-sign"></i>
+                    新增一行
+                </button>
+                
+            </div>
+        </li>
+        <%
+            });
+        %>
+    </ul>
+
+    <%
+        if (taglist.length > 0) {
+    %>
+    <div style="padding: 30px 0 80px;">
+        <button type="button" class="btn btn-primary" id="saveAll">保存全部</button>
+        <button type="reset" class="btn btn-default" id="cancel" style="margin-left: 20px;">取消编辑</button>
+    </div>
+    <%
+        } else {
+    %>
+    <div style="padding:50px 0;text-align: center;">不存在可编辑数据，<a href="/template/list">返回上一页!</a></div>
+    <%
+        }
+    %>
+</div>
+<style type="text/css">
+.page-edit .actions {
+    text-align: center;
+    margin-top: 15px;
+}
+.erow {
+    /*border-bottom: 1px dashed #d7d7d7;*/
+    width: 95%;
+    margin: 5px auto;
+    padding-bottom: 5px;
+    overflow: hidden;
+    position: relative;
+}
+.erow.light {
+    background: #f7f7f7;
+}
+.erow .unit {
+    width: 33%;
+    float: left;
+    overflow: hidden;
+    color: #666;
+    margin-top: 2px;
+}
+.erow .unit .field {
+    margin: 0 0 0 3px;
+}
+.title {
+    padding-bottom: 10px;
+    margin: 0 auto;
+}
+.page-edit .list li {
+   border: 1px solid #919191;
+   width: 100%;
+   margin: 0 auto 10px;
+   padding-bottom: 10px;
+
+}
+
+.delrow {
+    background: #9d9d9c;
+    border: 0 none;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    margin-top: -14px;
+}
+.delrow:hover{
+    background: #9d9d9c;
+}
+.page-edit .datas .text {
+    width: 195px;
+    border: 1px solid #717171;
+    border-radius: 5px;
+    height: 25px;
+    line-height: 25px;
+    color: #999;
+    padding-left: 5px;
+    margin-left: 5px;
+}    
+.tagNames {
+    font-size: 20px;
+}
+.tagNames .tips {
+    font-size: 16px;
+    color: #717171;
+    font-weight: 300;
+}
+
+</style>
+<script>
+
+    function saveTag(el) {
+        var id = el.attr('data-tagid');
+        var name = el.parents('li').find('h3').attr('data-tagname');
+        var type = el.attr('data-tagtype');
+        var erows = el.parents('li').find('.erow');
+        var templateId = $('.page-edit').attr('data-templateid');
+        
+        var datas = [];
+        var formValid = true;
+
+        erows.each(function(i, item) {
+            var data = [];
+            var el = $(item);
+            var units = el.find('.unit');
+            units.each(function(index, v) {
+                var input = $(v).find('input');
+                var tit = $(v).find('.tit');
+                
+                if (!input.val().trim()) {
+                    formValid = false;
+                }
+                data.push({
+                    field: input.attr('data-field'),
+                    title: tit.html(),
+                    value: input.val()
+                });
+            });
+            datas.push(data);
+        });
+
+        if (!formValid) {
+            alert('表单数据不能为空');
+            return;
+        }
+        
+
+        $.ajax({
+            url: '/page/save',
+            data: {
+                id: id,
+                name: name,
+                type: type,
+                templateId: templateId,
+                data: JSON.stringify({
+                    data: datas
+                })
+            },
+            type: 'POST'
+        }).done(function(data) {
+            if (data.code == 'success') {
+                alert(name + ' : 保存成功');
+            }
+        });
+    }
+
+    $('.page-edit').on('click', '.actions .save', function(e) {
+        saveTag($(e.currentTarget));
+    });
+
+    $('#saveAll').on('click', function() {
+        var saves = $('.actions .save');
+        var index = 0;
+        var timer = setInterval(function() {
+            var item = saves.eq(index);
+            if (item.length > 0) {
+                saveTag(item);
+                index++;
+            } else {
+                clearInterval(timer);
+            }
+        }, 500);
+
+        // saves.each(function(i, item) {
+        //     saveTag($(item));
+        // });
+    });
+
+    // 新增一行
+    $('.page-edit').on('click', '.actions .add', function(e) {
+        var el = $(e.currentTarget);
+        var li = el.parents('li');
+        var tbody = li.find('.datas');
+        var trs = li.find('.erow');
+
+        var maxRow = parseInt(li.attr('data-row'));
+        var row = trs.length;
+
+        if (row >= maxRow) {
+            alert('无法新增数据');
+            return;
+        }
+
+        var newtr = $('<div class="erow">' + trs.eq(0).html() + '</div>');
+        tbody.append(newtr);
+        newtr.find('input').val('')
+        
+        if (li.find('.erow').length == maxRow) {
+            el.hide();
+        }
+
+        if (li.find('.erow').length > li.attr('data-default-row')) {
+            li.find('.delrow').show();
+        }
+    });
+
+    // 删除一行
+    $('.page-edit').on('click', '.delrow', function(e) {
+        var el = $(e.currentTarget);
+        var li = el.parents('li');
+        var defaultRow = Number(li.attr('data-default-row'));
+        var row = Number(li.attr('data-row'));
+        el.parents('.erow').remove();
+
+        var addedErow = li.find('.erow');
+
+        if (defaultRow == addedErow.length) {
+            li.find('.delrow').hide();
+        }
+
+        if (addedErow.length < row) {
+            li.find('.add').show();
+        }
+    });
+
+    $('.page-edit')
+        .on('mouseover', '.erow', function(e) {
+            var el = $(e.currentTarget);
+            el.parents('.datas').find('.erow').removeClass('light');
+            el.addClass('light');
+        })
+        .on('mouseout', '.erow', function(e) {
+            $(e.currentTarget).removeClass('light');
+        });
+
+    $('#cancel').click(function(e) {
+        location.href = '/template/list';
+    })
+</script>
+<%= include('../public/footer') %>
+
+    
+    

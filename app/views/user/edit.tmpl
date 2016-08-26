@@ -1,0 +1,86 @@
+<%= include('../public/header') %>
+<%= include('../public/leftbar') %>
+<div class="bootstrap-admin-no-table-panel-content bootstrap-admin-panel-content collapse in">
+    <form class="form-horizontal">
+        <fieldset>
+            <legend>编辑用户</legend>
+            <input id="userId" type="hidden" 
+                        value="<%= typeof data._id != 'undefined' ? data._id : '' %>" autocomplete="off" data-provide="typeahead" data-items="4" >
+            <div class="form-group">
+                <label class="col-lg-2 control-label" for="typeahead">用户名</label>
+                <div class="col-lg-10">
+                    <input id="userName" type="text" class="form-control col-md-6" 
+                        value="<%= typeof data.userName != 'undefined' ? data.userName : '' %>"  autocomplete="off" data-provide="typeahead" data-items="4"  disabled>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label" for="typeahead">密码</label>
+                <div class="col-lg-10">
+                    <input id="password" type="password" class="form-control col-md-6" 
+                        value="unchange"  autocomplete="off" data-provide="typeahead" data-items="4" >
+                </div>
+            </div>
+            
+
+            <div class="form-group">
+                <label class="col-lg-2 control-label" for="select02">角色</label>
+                <div class="col-lg-10">
+                    <select id="role">
+                        <%for(i in roleMap){%>
+                        <option value="<%= i%>"<%=(typeof data.role !== 'undefined' && i == data.role)? 'selected':'' %>><%= i %></option>
+                        <% } %>
+                        <option value="module"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="action">
+                <button type="button" class="btn btn-primary" id="save">保存</button>
+                <button type="reset" class="btn btn-default">取消</button>
+            </div>
+            
+        </fieldset>
+    </form>
+</div>
+<style type="text/css">
+textarea {
+    width:100%;
+    height: 300px;
+    border-radius: 5px;
+}
+.action {
+    text-align: center;
+}
+.action .btn {
+    padding-left: 25px;
+    padding-right: 25px;
+}
+.action .btn.btn-default {
+    margin-left:20px;
+}
+
+</style>
+<script>
+    $('#save').click(function(e) {
+        $.ajax({
+            url: '/user/save',
+            data: {
+                userName : $('#userName').val(),
+                password: $('#password').val(),
+                role: $('#role').val(),
+                userId:$('#userId').val()
+            },
+            type: 'POST'
+        }).done(function(data) {
+            if (data.code == 'success') {
+                location.href = '/user/list';
+            }else{
+                alert(data.message);
+            }
+        });
+    });
+    
+</script>
+<%= include('../public/footer') %>
+
+    
+    

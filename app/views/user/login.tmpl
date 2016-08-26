@@ -1,0 +1,52 @@
+<%= include('../public/header') %>
+<div class="dialog">
+    <div class="panel panel-default" style="width: 40%; margin: 0 auto 60px;">
+        <p class="panel-heading no-collapse">Sign In</p>
+        <div class="panel-body" >
+            
+                <div class="form-group">
+                    <label>用户名</label>
+                    <input id="userName" type="text" class="form-control span12">
+                </div>
+                <div class="form-group">
+                <label>密码</label>
+                    <input id="password" type="password" class="form-controlspan12 form-control">
+                </div>
+                <a href="javascript:void(0)" class="btn btn-primary pull-right" id="signIn">登录</a>
+                <label class="remember-me"><input type="checkbox"> 记住我</label>
+                <div class="clearfix"></div>
+            
+        </div>
+    </div>
+    <script>
+     var query = function (name , scope) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"),
+            scope = scope || 'search',
+            r = location[scope].substr(1).match(reg);
+        if (r != null) {
+            return unescape(r[2]); 
+        }
+        return null;
+    };
+
+    $('#signIn').click(function(e) {
+        $.ajax({
+            url: '/user/doLogin',
+            data: {
+                userName : $('#userName').val(),
+                password: $('#password').val()
+            },
+            type: 'POST'
+        }).done(function(data) {
+            
+            if (data.code == 'success') {
+                location.href = decodeURIComponent(query('return_url') || '/');
+            }else{
+
+                alert(data.message);
+            }
+        });
+    });
+    
+</script>
+<%= include('../public/footer') %>

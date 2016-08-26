@@ -1,0 +1,90 @@
+<%= include('../public/header') %>
+<%= include('../public/leftbar') %>
+<div class="bootstrap-admin-no-table-panel-content bootstrap-admin-panel-content collapse in">
+    <form class="form-horizontal">
+        <fieldset>
+            <legend>新建模板</legend>
+            
+            <div class="form-group">
+                <label class="col-lg-2 control-label" for="typeahead">名称</label>
+                <div class="col-lg-10"><input id="modelName" type="text" class="form-control col-md-6" value="<%= typeof name != 'undefined' ? name : '' %>" id="name" autocomplete="off" data-provide="typeahead" data-items="4" data-source="[&quot;Alabama&quot;,&quot;Alaska&quot;,&quot;Arizona&quot;,&quot;Arkansas&quot;,&quot;California&quot;,&quot;Colorado&quot;,&quot;Connecticut&quot;,&quot;Delaware&quot;,&quot;Florida&quot;,&quot;Georgia&quot;,&quot;Hawaii&quot;,&quot;Idaho&quot;,&quot;Illinois&quot;,&quot;Indiana&quot;,&quot;Iowa&quot;,&quot;Kansas&quot;,&quot;Kentucky&quot;,&quot;Louisiana&quot;,&quot;Maine&quot;,&quot;Maryland&quot;,&quot;Massachusetts&quot;,&quot;Michigan&quot;,&quot;Minnesota&quot;,&quot;Mississippi&quot;,&quot;Missouri&quot;,&quot;Montana&quot;,&quot;Nebraska&quot;,&quot;Nevada&quot;,&quot;New Hampshire&quot;,&quot;New Jersey&quot;,&quot;New Mexico&quot;,&quot;New York&quot;,&quot;North Dakota&quot;,&quot;North Carolina&quot;,&quot;Ohio&quot;,&quot;Oklahoma&quot;,&quot;Oregon&quot;,&quot;Pennsylvania&quot;,&quot;Rhode Island&quot;,&quot;South Carolina&quot;,&quot;South Dakota&quot;,&quot;Tennessee&quot;,&quot;Texas&quot;,&quot;Utah&quot;,&quot;Vermont&quot;,&quot;Virginia&quot;,&quot;Washington&quot;,&quot;West Virginia&quot;,&quot;Wisconsin&quot;,&quot;Wyoming&quot;]"></div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label" for="select02">业务</label>
+                <div class="col-lg-10">
+                    <select id="group">
+                        <option value="uplive">up直播</option>
+                        <option value="pengpeng">碰碰</option>
+                        <option value="daidai">呆呆</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-lg-2 control-label" for="select02">模板类型</label>
+                <div class="col-lg-10">
+                    <select id="modelType">
+                        <option value="page">页面</option>
+                        <option value="module">模块</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label" for="typeahead">内容</label>
+                <div class="col-lg-10">
+                    <textarea id="content"></textarea>
+                </div>
+            </div>
+            <div class="action">
+                <button type="button" class="btn btn-primary" id="save">保存</button>
+                <button type="reset" class="btn btn-default" id="cancel">取消</button>
+            </div>
+            
+        </fieldset>
+    </form>
+</div>
+<style type="text/css">
+textarea {
+    width:100%;
+    height: 300px;
+    border-radius: 5px;
+}
+.action {
+    text-align: center;
+}
+.action .btn {
+    padding-left: 25px;
+    padding-right: 25px;
+}
+.action .btn.btn-default {
+    margin-left:20px;
+}
+
+</style>
+<script>
+    $('#save').click(function(e) {
+        $.ajax({
+            url: '/template/save',
+            data: {
+                content : $('#content').val(),
+                name: $('#modelName').val(),
+                type: $('#modelType').val(),
+                group: $('#group').val()
+            },
+            type: 'POST'
+        }).done(function(data) {
+            if (data.code == 'success') {
+                location.href = '/template/list';
+            }
+        });
+    });
+
+    $('#cancel').click(function(e) {
+        location.href = '/template/list';
+    });
+    
+</script>
+<%= include('../public/footer') %>
+
+    
+    

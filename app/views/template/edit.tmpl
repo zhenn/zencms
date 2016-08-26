@@ -1,0 +1,83 @@
+<%= include('../public/header') %>
+<%= include('../public/leftbar') %>
+<div class="bootstrap-admin-no-table-panel-content bootstrap-admin-panel-content collapse in">
+    <form class="form-horizontal">
+        <fieldset>
+            <legend>模板编辑</legend>
+            <div class="form-group">
+                <label class="col-lg-2 control-label" for="typeahead">id</label>
+                <div class="col-lg-10" id="templateId"><%= _id %></div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-lg-2 control-label" for="typeahead">名称</label>
+                <div class="col-lg-10"><%= name %></div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-lg-2 control-label" for="typeahead">模板类型</label>
+                <div class="col-lg-10"><%= type %></div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-lg-2 control-label" for="typeahead">业务类型</label>
+                <div class="col-lg-10"><%= group %></div>
+            </div>
+            
+            <div class="form-group">
+                <label class="col-lg-2 control-label" for="typeahead">内容</label>
+                <div class="col-lg-10">
+                    <textarea id="content"><%= content %></textarea>
+                </div>
+            </div>
+            <div class="action">
+                <button type="button" class="btn btn-primary" id="save">保存</button>
+                <button type="reset" class="btn btn-default" id="cancel">取消</button>
+            </div>
+            
+        </fieldset>
+    </form>
+</div>
+<style type="text/css">
+textarea {
+    width:100%;
+    height: 300px;
+    border-radius: 5px;
+}
+.action {
+    text-align: center;
+}
+.action .btn {
+    padding-left: 25px;
+    padding-right: 25px;
+}
+.action .btn.btn-default {
+    margin-left:20px;
+}
+
+</style>
+<script>
+    $('#save').click(function(e) {
+        $.ajax({
+            url: '/template/save',
+            data: {
+                content : $('#content').val(),
+                templateId: $('#templateId').html()
+            },
+            type: 'POST'
+        }).done(function(data) {
+            if (data.code == 'success') {
+                location.href = '/template/list';
+            }
+        });
+    });
+
+    $('#cancel').click(function(e) {
+        location.href = '/template/list';
+    });
+    
+</script>
+<%= include('../public/footer') %>
+
+    
+    

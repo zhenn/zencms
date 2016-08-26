@@ -1,0 +1,43 @@
+<!-- left, vertical navbar -->
+<div class="col-md-2 bootstrap-admin-col-left">
+    <ul class="nav navbar-collapse collapse bootstrap-admin-navbar-side">
+        <li class="active">
+            <a href="javascript:void(0)" style="cursor: default;"><i class="glyphicon glyphicon-chevron-right"></i> 面板</a>
+        </li>
+        <%
+            if(isShowByRole("/user/list")){
+        %>
+        <li>
+            <a href="/user/list"><i class="glyphicon glyphicon-chevron-right"></i>用户管理</a><!-- calendar.html -->
+        </li>
+        <%
+            }
+            if(isShowByRole("/template/list")){
+        %>
+        <li>
+            <a href="/template/list"><i class="glyphicon glyphicon-chevron-right"></i>模板管理</a>
+        </li>
+        <%
+            }
+        %>
+        
+
+        <%
+        if(isShowByRole("/template/list")){
+        %>
+        <li>
+            <a href="/file/upload"><i class="glyphicon glyphicon-chevron-right"></i>上传图片</a>
+        </li>
+        <%
+        }
+        %>
+        <li>
+            <a href="/about"><i class="glyphicon glyphicon-chevron-right"></i>ZenCMS介绍</a>
+        </li>
+        
+        
+    </ul>
+</div>
+
+<!-- content -->
+            <div class="col-md-10" style="min-height: 500px;">

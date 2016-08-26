@@ -1,0 +1,120 @@
+<%= include('../public/header') %>
+<%= include('../public/leftbar') %>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <div class="text-muted bootstrap-admin-box-title">
+            用户列表
+            <%
+            if(isShowByRole("/user/create")){
+            %>
+            <a href="/user/create">
+                <button class="btn btn-sm btn-primary" id="createNew">
+                    <i class="glyphicon glyphicon-pencil"></i>
+                    新建用户
+                </button>
+            </a>
+            <%
+             } 
+            %>
+        </div>
+    </div>
+    <div class="bootstrap-admin-panel-content">
+        <table class="table bootstrap-admin-table-with-actions">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>用户名</th>
+                    <th>角色</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+            	<% data.forEach(function(item, index) {
+
+            	%>
+                <tr>
+                    <td><%= index + 1 %></td>
+                    <td><%= item.userName %></td>
+                    <td><%= item.role %></td>
+                    <td class="actions">
+                        <%
+                        if(isShowByRole("/user/edit")){
+                        %>
+                        <a href="/user/edit/<%= item._id %>">
+                            <button class="btn btn-sm btn-primary">
+                                <i class="glyphicon glyphicon-pencil"></i>
+                                编辑
+                            </button>
+                        </a>
+                        <%
+                        }
+                        %>
+                        </a>
+                        
+                        <a href="#" class="delete" data-templateId="<%= item._id %>">
+<!--                             <button class="btn btn-sm btn-danger">
+                                <i class="glyphicon glyphicon-trash"></i>
+                                删除
+                            </button> -->
+                        </a>
+                    </td>
+                </tr>
+               	<%
+               		});
+               	%>
+            </tbody>
+        </table>
+    </div>
+
+    <div style="text-align: right; height: 40px; font-size: 16px; padding-right: 20px;">
+        第
+        <select id="page">
+            <%
+                for(var i = 1; i <= $page.pageCount; i++) {
+            %>
+            <option value="<%= i %>" <% if(i==$page.pageNumber) print('selected') %>><%= i %></option>
+            <%
+                }
+            %>
+        </select>
+        页, 共 <%= $page.pageCount %> 页
+    </div>
+</div>
+
+<script>
+    var query = function (name , scope) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"),
+            scope = scope || 'search',
+            r = location[scope].substr(1).match(reg);
+        if (r != null) {
+            return unescape(r[2]); 
+        }
+        return null;
+    };
+
+    $('.delete').click(function(e) {
+        var el = $(e.currentTarget);
+        var templateId = el.attr('data-templateId');
+        $.ajax({
+            url: '/user/delete',
+            data: {
+                templateId: templateId
+            },
+            type: 'POST'
+        }).done(function(data) {
+            if (data.code == 'success') {
+                location.reload();
+            }
+        });
+    });
+
+    $('#page').on('change', function(e) {
+        var el = $(e.currentTarget);
+        var page = el.val();
+
+        location.href = '/user/list?pageSize=' + query('pageSize') + '&page=' + page; 
+    });
+</script>
+<%= include('../public/footer') %>
+    
+    

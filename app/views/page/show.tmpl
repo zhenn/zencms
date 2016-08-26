@@ -1,0 +1,83 @@
+<%= include('../public/header') %>
+<%= include('../public/leftbar') %>
+
+<h2 class="title">页面预览<span>：<%= group %> > <%= name %></h2>
+
+<div class="box">
+    <div id="iframe">
+        <div class="pagetit"></div>
+        <iframe src="/page/render?templateId=<%= _id %>"></iframe>
+    </div>
+    <div class="actions">
+        <button class="btn btn-primary">发布页面</button>
+        <span>（生成外部可访问链接）</span>
+        <div class="tip">地址：<em><a href="http://www.baidu.com">http://www.baidu.com</a></em></div>
+    </div>
+</div>
+<style type="text/css">
+.box {
+    overflow: hidden;
+}
+.title {
+    border-bottom: 1px solid #d7d7d7;
+    font-size: 22px;
+    color: #666;
+    line-height: 2;
+    margin-top: 0;
+}
+.title span {
+    font-weight: 300;
+    font-size: 16px;
+    margin-left: 10px;
+}
+.actions {
+    float: left;
+    margin: 250px 0 0 100px;
+}
+.actions span {
+    color: #777;
+}
+.actions .tip {
+    margin-top: 16px;
+}
+.actions .tip em {
+    text-decoration: underline;
+}
+#iframe {
+    width: 300px;
+    height: 612px;
+    background: url(http://g.cdn.pengpengla.com/oauthgame/sss.png) no-repeat;
+    background-size: 300px 612px;
+    border-radius: 50px;
+    float: left;
+    margin-left: 50px;
+    position: relative;
+}
+#iframe .pagetit {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    top: 98px;
+    left: 0;
+    color: #333;
+    font-size: 16px;
+}
+iframe{
+    width: 259px;
+    height: 408px;
+    border: 0 none;
+    margin: 127px 0 0 20px;
+    display: block;
+    float: left;
+}
+</style>
+<script>
+    $('iframe').on('load', function(e) {
+        var iframe = $(e.currentTarget);
+        $('.pagetit').html(iframe[0].contentWindow.document.title);
+    });
+</script>
+<%= include('../public/footer') %>
+
+    
+    

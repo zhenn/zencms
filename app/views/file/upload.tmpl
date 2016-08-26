@@ -1,0 +1,78 @@
+<%= include('../public/header') %>
+<%= include('../public/leftbar') %>
+<div class="bootstrap-admin-no-table-panel-content bootstrap-admin-panel-content collapse in">
+    <form class="form-horizontal">
+        <fieldset>
+            <legend>上传文件</legend>
+            
+            <div class="form-group">
+                
+                <div id="imgPreview">
+                    
+                </div>
+                <p id="imgUrl">
+                    
+                </p>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label" for="typeahead">选择文件</label>
+                <div class="col-lg-10">
+                    <input id="file" type="file" class="form-control col-md-6" 
+                        value="<%= typeof name != 'undefined' ? name : '' %>" id="name" autocomplete="off" data-provide="typeahead" data-items="4" >
+                </div>
+            </div>
+            <div class="action">
+                <button type="button" class="btn btn-primary" id="fileUpload">上传</button>
+                <button type="reset" class="btn btn-default">取消</button>
+            </div>
+            
+        </fieldset>
+    </form>
+</div>
+<style type="text/css">
+textarea {
+    width:100%;
+    height: 300px;
+    border-radius: 5px;
+}
+.action {
+    text-align: center;
+}
+.action .btn {
+    padding-left: 25px;
+    padding-right: 25px;
+}
+.action .btn.btn-default {
+    margin-left:20px;
+}
+
+</style>
+<script>
+    $('#fileUpload').click(function(e) {
+        var formData = new FormData();
+        formData.append('file', $('#file')[0].files[0]);
+        $.ajax({
+            url: '/file/doUpload',
+            type: 'POST',
+            cache: false,
+            data: formData,
+            processData: false,
+            contentType: false,
+            dataType: 'JSON',
+            timeout: 30000
+        }).done(function(res) {
+            if (res.code =='fail') {
+                alert(res.msg);
+            } else {
+                $('#imgUrl').html(res.url);
+            }
+        }).fail(function(res) {
+            alert('上传失败');
+        });
+    });
+    
+</script>
+<%= include('../public/footer') %>
+
+    
+    

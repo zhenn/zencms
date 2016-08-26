@@ -1,0 +1,31 @@
+{
+    "admin": [
+    	"/template/list",
+    	"/template/edit",
+    	"/template/save",
+    	"/template/delete",
+    	"/template/create",
+
+    	"/user/create",
+    	"/user/save",
+    	"/user/list",
+    	"/user/edit",
+
+    	"/page/edit",
+    	"/page/save",
+    	"/page/preview",
+        "/page/render",
+
+        "/file/upload"
+    ],
+    "developer": [
+    	"/template/list",
+    	"/template/edit",
+    	"/template/save",
+    	"/template/delete",
+    	"/template/create"
+    	
+    ],
+    "editor": [""]
+}
+

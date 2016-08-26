@@ -1,0 +1,172 @@
+<%= include('../public/header') %>
+<%= include('../public/leftbar') %>
+<style type="text/css">
+    #createNew { position: absolute; right: 20px; top: 5px;}
+    .actions a {margin-right: 10px;}
+    .search {
+        /*float: left;*/
+        overflow: hidden;
+        padding: 10px 0 0 15px;
+        font-weight: 300;
+    }
+    .search .fieldbox {margin-right: 10px;}
+    .search .fieldbox select{
+        width: 100px;
+    }
+    .search .fieldbox input { width: 140px; border-radius: 5px;border: 1px solid #d7d7d7;color: #999;padding:0 5px;line-height: 24px;}
+</style>
+<div class="panel panel-default">
+    <div class="panel-heading" style="position: relative; overflow: hidden;">
+        <div class="text-muted bootstrap-admin-box-title">
+            模板列表
+        </div>
+
+        <a href="/template/create">
+            <button class="btn btn-sm btn-primary" id="createNew">
+                <i class="glyphicon glyphicon-pencil"></i>
+                新建模板
+            </button>
+        </a>
+    </div>
+
+    <%
+        if (data.length > 0) {
+    %>
+    <div class="search">
+        <!-- <span class="tit">精确查找：</span> -->
+        <form method="get" action="/template/list">
+        
+        <span class="fieldbox">创建者：<input type="text" name="creator" id="creator" /></span>
+        <span class="fieldbox">
+            业务：
+            <select id="group" name="group">
+                <option value="">不限制</option>
+                <% 
+                    for (var i in groups) {
+                %>
+                <option value="<%= i %>"><%= groups[i] %></option>
+                <%
+                    }
+                %>
+            </select>
+        </span>
+        <span class="fieldbox">
+            模块名称：
+            <input type="text" id="templateName" name="name" />
+        </span>
+        
+
+        <button class="btn btn-default searchs" type="submit">搜索</button>        
+        </form>
+    </div>
+    <div class="bootstrap-admin-panel-content">
+        <table class="table bootstrap-admin-table-with-actions">
+            <thead>
+                <tr>
+                    <th>名称</th>
+                    <th>业务</th>
+                    <th>模板类型</th>
+                    <th>创建者</th>
+                    <th>线上地址</th>
+                    <th width="340" style="text-align: center;">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+            	<% 
+                    data.forEach(function(item, index) {
+            	%>
+                <tr>
+                    <td><%= item.name %></td>
+                    <td><%= item.group %></td>
+                    <td><%= item.type %></td>
+                    <td><%= item.creator %></td>
+                    <td><%= item.link %></td>
+                    <td class="actions">
+                        <a href="/template/edit/<%= item._id %>">
+                            <button class="btn btn-default">编辑模板</button>
+                        </a>
+
+                        <a href="/page/edit?templateId=<%= item._id %>">
+                            <button class="btn btn-default">编辑数据</button>
+                        </a>
+                        
+                        <a href="/page/preview?templateId=<%= item._id %>">
+                            <button class="btn btn-default">预览</button>
+                        </a>
+                        
+                        <a href="#" class="delete" data-templateId="<%= item._id %>">
+                            <button class="btn btn-default">删除</button>
+                        </a>
+                    </td>
+                </tr>
+               	<%
+               		});
+               	%>
+            </tbody>
+        </table>
+    </div>
+
+    <div style="text-align: right; height: 40px; font-size: 16px; padding-right: 20px;">
+        第
+        <select id="page">
+            <%
+                for(var i = 1; i <= $page.pageCount; i++) {
+            %>
+            <option value="<%= i %>" <% if(i==$page.pageNumber) print('selected') %>><%= i %></option>
+            <%
+                }
+            %>
+        </select>
+        页, 共 <%= $page.pageCount %> 页
+    </div>
+    <%
+        } else {
+    %>
+
+    <div style="text-align: center; padding: 50px 0;">暂无模板, 马上<a href="/template/create">新建</a>一个!</div>
+    <%
+        } 
+    %>
+</div>
+
+<script>
+    var query = function (name , scope) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"),
+            scope = scope || 'search',
+            r = location[scope].substr(1).match(reg);
+        if (r != null) {
+            return unescape(r[2]); 
+        }
+        return null;
+    };
+
+    $('.searchs').click(function(e) {
+        
+    });
+
+    $('.delete').click(function(e) {
+        var el = $(e.currentTarget);
+        var templateId = el.attr('data-templateId');
+        $.ajax({
+            url: '/template/delete',
+            data: {
+                templateId: templateId
+            },
+            type: 'POST'
+        }).done(function(data) {
+            if (data.code == 'success') {
+                location.reload();
+            }
+        });
+    });
+
+    $('#page').on('change', function(e) {
+        var el = $(e.currentTarget);
+        var page = el.val();
+
+        location.href = '/template/list?pageSize=' + query('pageSize') + '&page=' + page; 
+    });
+</script>
+<%= include('../public/footer') %>
+    
+    
