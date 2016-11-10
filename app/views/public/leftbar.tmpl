@@ -15,15 +15,18 @@
             if(isShowByRole("/template/list")){
         %>
         <li>
-            <a href="/template/list"><i class="glyphicon glyphicon-chevron-right"></i>模板管理</a>
+            <a href="/template/list"><i class="glyphicon glyphicon-chevron-right"></i>模板系统</a>
         </li>
         <%
             }
+            if (isShowByRole('/richtext/list')) {
         %>
-        
-
+        <li>
+            <a href="/richtext/list"><i class="glyphicon glyphicon-chevron-right"></i>富文本类</a>
+        </li>
         <%
-        if(isShowByRole("/template/list")){
+            }
+            if(isShowByRole("/template/list")){
         %>
         <li>
             <a href="/file/upload"><i class="glyphicon glyphicon-chevron-right"></i>上传图片</a>

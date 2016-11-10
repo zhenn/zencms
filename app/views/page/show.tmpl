@@ -1,20 +1,44 @@
 <%= include('../public/header') %>
 <%= include('../public/leftbar') %>
 
-<h2 class="title">页面预览<span>：<%= group %> > <%= name %></h2>
+<h2 class="title">页面预览<span>：<%= global.groupmap[group] %> > <%= name %></h2>
 
 <div class="box">
     <div id="iframe">
         <div class="pagetit"></div>
+        <%
+            if (pagetype == 'richtext') {
+        %>
+        <iframe src="/richtext/render?pageId=<%= _id %>"></iframe>
+        <%
+            } else if (pagetype == 'templatetype') {
+        %>
         <iframe src="/page/render?templateId=<%= _id %>"></iframe>
+        <%
+            }
+        %>
     </div>
+
     <div class="actions">
-        <button class="btn btn-primary">发布页面</button>
+
+        <button class="btn btn-primary" data-group="<%= group %>" id="publish">发布页面</button>
         <span>（生成外部可访问链接）</span>
-        <div class="tip">地址：<em><a href="http://www.baidu.com">http://www.baidu.com</a></em></div>
+        <div id="status">状态：<% if(!link){ %>未发布<% } else{ %>已发布 <% } %></div>
+        <div class="tip<% if(!link){ %> hidden<% } %>" id="link">地址：<em><a target="_blank" href="<%= link %>"><%= link %></a></em></div>
+        
+        <div id="qrcode" <% if (!link) { %> class="hidden"<%}%> data-link="<%= link %>"></div>
+        
     </div>
 </div>
 <style type="text/css">
+#qrcode {
+    width: 200px;
+    height: 200px;
+    margin-top: 20px;
+}
+#status {
+    margin-top: 10px;
+}
 .box {
     overflow: hidden;
 }
@@ -32,7 +56,10 @@
 }
 .actions {
     float: left;
-    margin: 250px 0 0 100px;
+    margin: 100px 0 0 70px;
+    width: 525px;
+    overflow: hidden;
+    
 }
 .actions span {
     color: #777;
@@ -71,10 +98,71 @@ iframe{
     float: left;
 }
 </style>
+<script type="text/javascript" src="/js/qrcode.js"></script>
 <script>
+
+    var query = function (str) {
+        var reg = /=(.*)$/i;
+        var result;
+        str.replace(reg, function($1, $2, $3, $4) {
+            result = $2;
+        });
+       
+        return result;
+    };
+
+
+    var qrcode = $('#qrcode');
+    if (!qrcode.hasClass('hidden')) {
+        qrcode.qrcode({
+            text: qrcode.attr('data-link'),
+            width: 200,
+            height: 200
+        }); 
+    }
+
     $('iframe').on('load', function(e) {
         var iframe = $(e.currentTarget);
         $('.pagetit').html(iframe[0].contentWindow.document.title);
+    });
+
+    $('#publish').click(function(e) {
+        var el = $(e.currentTarget);
+        var source = location.origin + $('iframe').attr('src');
+       
+        $.ajax({
+            url: '/file/publish',
+            type: 'POST',
+            data: {
+                source: source,
+                pageid: query(source),
+                group: el.attr('data-group'),
+                pagetype: '<%= pagetype %>'
+            },
+            dataType: 'json'
+        }).done(function(res) {
+            if (res.code == 'success') {
+                alert('发布成功');
+                $('#link')
+                    .removeClass('hidden')
+                    .find('a')
+                    .attr('href', res.data.link)
+                    .html(res.data.link);
+                $('#status').html('状态：已发布');
+                $('#qrcode').removeClass('hidden');
+
+                qrcode.qrcode({
+                    text: res.data.link,
+                    width: 200,
+                    height: 200
+                }); 
+
+            } else {
+                alert('发布失败');
+            }
+        }).fail(function() {
+            alert('发布失败, 请联系管理员!');
+        });
     });
 </script>
 <%= include('../public/footer') %>

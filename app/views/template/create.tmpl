@@ -13,9 +13,13 @@
                 <label class="col-lg-2 control-label" for="select02">业务</label>
                 <div class="col-lg-10">
                     <select id="group">
-                        <option value="uplive">up直播</option>
-                        <option value="pengpeng">碰碰</option>
-                        <option value="daidai">呆呆</option>
+                        <%
+                            for (var i in global.groupmap) {
+                        %>
+                        <option value="<%= i %>"><%= global.groupmap[i] %></option>
+                        <%
+                            }
+                        %>
                     </select>
                 </div>
             </div>

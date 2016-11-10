@@ -14,23 +14,20 @@
         width: 100px;
     }
     .search .fieldbox input { width: 140px; border-radius: 5px;border: 1px solid #d7d7d7;color: #999;padding:0 5px;line-height: 24px;}
-    td {
-        vertical-align: middle!important;
-    }
 </style>
 <div class="panel panel-default">
     <div class="panel-heading" style="position: relative; overflow: hidden;">
         <div class="text-muted bootstrap-admin-box-title">
-            模板列表
+            富文本页列表
         </div>
 
         <%
-            if (isShowByRole('/template/create')) {
+            if (isShowByRole('/richtext/create')) {
         %>
-        <a href="/template/create">
+        <a href="/richtext/create">
             <button class="btn btn-sm btn-primary" id="createNew">
                 <i class="glyphicon glyphicon-pencil"></i>
-                新建模板
+                新建富文本页
             </button>
         </a>
         <%
@@ -43,7 +40,7 @@
     %>
     <div class="search">
         <!-- <span class="tit">精确查找：</span> -->
-        <form method="get" action="/template/list">
+        <form method="get" action="/richtext/list">
         
         <span class="fieldbox">创建者：<input type="text" name="creator" id="creator" /></span>
         <span class="fieldbox">
@@ -60,7 +57,7 @@
             </select>
         </span>
         <span class="fieldbox">
-            模块名称：
+            页面名称：
             <input type="text" id="templateName" name="name" />
         </span>
         
@@ -72,57 +69,44 @@
         <table class="table bootstrap-admin-table-with-actions">
             <thead>
                 <tr>
-                    <th>名称</th>
+                    <th>页面名称</th>
                     <th>业务</th>
-                    <th>模板类型</th>
+                    
                     <th>创建者</th>
-                    <th width="160" style="text-align: center;">线上地址</th>
-                    <th width="370" style="text-align: center;">操作</th>
+                    <th width="180" style="text-align:center">线上地址</th>
+                    <th width="300" style="text-align: center;">操作</th>
                 </tr>
             </thead>
             <tbody>
-            	<% 
+                <% 
                     data.forEach(function(item, index) {
-            	%>
+                %>
                 <tr>
                     <td><%= item.name %></td>
                     <td><%= global.groupmap[item.group] %></td>
-                    <td><%= item.type %></td>
+                    
                     <td><%= item.creator %></td>
-                    <td><a href="<%= item.link %>" target="_blank"><%= item.link && item.link.replace(/^.*\//, '') %></a></td>
+                    <td><a target="_blank" href="<%= item.link %>"><%= item.link && item.link.replace(/^.*\//, '') %></a></td>
                     <td class="actions" style="text-align: center;">
                         <%
-                            if (isShowByRole('/template/edit')) {
+                            if (isShowByRole('/richtext/edit')) {
                         %>
-                        <a href="/template/edit/<%= item._id %>">
-                            <button class="btn btn-default">编辑模板</button>
-                        </a>
-                        <%
-                            }
-                            if (isShowByRole('/page/edit')) {
-                        %>
-                        <a href="/page/edit?templateId=<%= item._id %>">
-                            <button class="btn btn-default">编辑数据</button>
+                        <a href="/richtext/edit?pageId=<%= item._id %>">
+                            <button class="btn btn-default">编辑页面</button>
                         </a>
                         <%
                             }
                             if (isShowByRole('/page/preview')) {
                         %>
-                        <a href="/page/preview?templateId=<%= item._id %>">
+                        <a href="/richtext/preview?pageId=<%= item._id %>">
                             <button class="btn btn-default">预览</button>
                         </a>
+                        
                         <%
                             }
-                            if (isShowByRole('/page/preview')) {
+                            if (isShowByRole('/richtext/delete')) {
                         %>
-                        <a target="_blank" href="<%if(global.env=='product'){ print('http://h5-cmsapi.pengpengla.com') }%>/page/getjson/<%= item._id %>">
-                            <button class="btn btn-default">JSON</button>
-                        </a>
-                        <%
-                            }
-                            if (isShowByRole('/template/delete')) {
-                        %>
-                        <a href="#" class="delete" data-templateId="<%= item._id %>">
+                        <a href="#" class="delete" data-pageid="<%= item._id %>">
                             <button class="btn btn-default">删除</button>
                         </a>
                         <%
@@ -130,9 +114,9 @@
                         %>
                     </td>
                 </tr>
-               	<%
-               		});
-               	%>
+                <%
+                    });
+                %>
             </tbody>
         </table>
     </div>
@@ -154,7 +138,7 @@
         } else {
     %>
 
-    <div style="text-align: center; padding: 50px 0;">暂无模板, 马上<a href="/template/create">新建</a>一个!</div>
+    <div style="text-align: center; padding: 50px 0;">暂无富文本页面, 马上<a href="/richtext/create">新建</a>一个!</div>
     <%
         } 
     %>
@@ -222,20 +206,17 @@
         return preUrl + (query && query.length > 0 ? '' : '?') +  ( id + $.param(data)) + hash;
     }
 
-    $('.searchs').click(function(e) {
-        
-    });
 
     $('.delete').click(function(e) {
         var el = $(e.currentTarget);
-        var templateId = el.attr('data-templateId');
+        var pageId = el.attr('data-pageid');
 
         var _confirm = confirm('删除操作不可逆，确认删除吗？');
         if (_confirm) {
             $.ajax({
-                url: '/template/delete',
+                url: '/richtext/delete',
                 data: {
-                    templateId: templateId
+                    pageId: pageId
                 },
                 type: 'POST'
             }).done(function(data) {
@@ -244,7 +225,6 @@
                 }
             });
         }
-
         
     });
 

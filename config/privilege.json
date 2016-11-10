@@ -15,17 +15,69 @@
     	"/page/save",
     	"/page/preview",
         "/page/render",
+        "/page/getjson",
 
-        "/file/upload"
+        "/file/upload",
+        "/file/doUpload",
+        "/file/publish",
+        "/about",
+
+        "/richtext/list",
+        "/richtext/create",
+        "/richtext/save",
+        "/richtext/edit",
+        "/richtext/delete",
+        "/richtext/preview",
+        "/richtext/render"
     ],
     "developer": [
     	"/template/list",
     	"/template/edit",
     	"/template/save",
     	"/template/delete",
-    	"/template/create"
+    	"/template/create",
+
+        "/page/edit",
+        "/page/save",
+        "/page/preview",
+        "/page/render",
+        "/page/getjson",
+
+        "/file/upload",
+        "/file/doUpload",
+        "/file/publish",
+        "/about",
+
+        "/richtext/list",
+        "/richtext/create",
+        "/richtext/save",
+        "/richtext/edit",
+        "/richtext/delete",
+        "/richtext/preview",
+        "/richtext/render"
     	
     ],
-    "editor": [""]
+    "editor": [
+        "/template/list",
+
+        "/page/edit",
+        "/page/save",
+        "/page/preview",
+        "/page/render",
+        "/page/getjson",
+
+        "/file/upload",
+        "/file/doUpload",
+        "/file/publish",
+        "/about",
+
+        "/richtext/list",
+        "/richtext/create",
+        "/richtext/save",
+        "/richtext/edit",
+        "/richtext/delete",
+        "/richtext/preview",
+        "/richtext/render"
+    ]
 }
 

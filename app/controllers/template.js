@@ -38,8 +38,7 @@ exports.showList = function(req, res) {
 
             res.render('template/list', { 
                 data: data,
-                $page: $page,
-                groups: require('../../config/groupmap.json')
+                $page: $page
             });
         }
     });

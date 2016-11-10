@@ -9,9 +9,9 @@ var bodyParser = require('body-parser');
 var routes = require('./config/routes');
 var formidable = require('express-formidable');
 var db = require('./config/db');
+require('./config/global');
 
 var app = express();
-var env = app.get('env');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'app/views'));
@@ -29,7 +29,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
   secret: 'ilovekiro',
   cookie: {
-    maxAge: 60 * 30 *1000
+    maxAge: 60 * 180 *1000
   },
   resave:true,
   saveUninitialized: true
@@ -37,7 +37,7 @@ app.use(session({
 
 // 接收upload文件的插件
 app.use(formidable.parse({
-  multiples: true
+    multiples: true
 }));
 
 // 路由配置
@@ -54,7 +54,7 @@ app.use(function(req, res, next) {
 
 // development error handler
 // will print stacktrace
-if (env === 'development') {
+if (global.env === 'development') {
   app.use(function(err, req, res, next) {
     res.status(err.status || 500);
     res.render('error', {

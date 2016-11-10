@@ -13,10 +13,10 @@ function createConnect() {
     var connection;
 
     if (env == 'development') {
-        connection = mongoose.connect('mongodb://user:pwd@host:port/zencms', options).connection;
+        connection = mongoose.connect('mongodb://10.0.1.34:27017/zencms', options).connection;
     } else {
         // 线上数据库待配置
-        connection = mongoose.connect('mongodb://user:pwd@host:port/zencms', options).connection;
+        connection = mongoose.connect('mongodb://zencms:4prHUede59G@phpmongo-os01:12100/zencms', options).connection;
     }
     return connection;
 }

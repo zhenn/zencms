@@ -46,12 +46,59 @@ exports.render = function(req, res, next) {
                 tagData = parseTagData(tagData);
                 return '<% var data = ' + JSON.stringify(tagData) + '; %>' + c;
             });
-
-            // console.log(templateContent);
-
+            
             var result = _.template(templateContent)();
 
             res.send(result);
+        }
+    });
+};
+
+// 用于模块输出json的接口
+exports.getJSON = function(req, res, next) {
+    var templateId = req.params.templateId;
+    var result = {};
+    TemplateModel.findById(templateId, function(err, data) {
+        // 允许ajax跨域请求
+        res.append('Access-Control-Allow-Origin', '*');
+        if (err) {
+
+            res.json({
+                code: 'fail',
+                data: err.message
+            });
+
+        } else {
+            var templateContent = data.content;
+            var cmsTagReg = /(<cms:[\s\S]+?>)([\s\S]*?)(<\/cms>)/gi;
+            var tagDatas = data.tagData;
+            // console.log(tagDatas)
+            templateContent = templateContent.replace(cmsTagReg, function(a, b, c, d) {
+                
+                var tagIdReg = /id="(.*?)"/i;
+                var aliasReg = /alias="(.*?)"/i;
+                var tagId = b.match(tagIdReg) && b.match(tagIdReg)[1];
+                var alias = b.match(aliasReg) && b.match(aliasReg)[1];
+                
+                var tagData = {};
+
+                for (var i = 0; i < tagDatas.length; i++) {
+                    var item = tagDatas[i];
+                    if (item.id == tagId) {
+                        tagData = item;
+                        break;
+                    }
+                }
+
+                tagData = parseTagData(tagData);
+                result[alias] = tagData;
+                // return '<% var data = ' + JSON.stringify(tagData) + '; %>' + c;
+            });
+
+            res.json({
+                code: 'success',
+                data: result
+            });
         }
     });
 };
@@ -70,6 +117,7 @@ exports.show = function(req, res, next) {
                 next(err);
             } else {
                 data.setAlias();
+                data.pagetype = 'templatetype';
                 res.render('page/show', data);
             }
         }
@@ -103,6 +151,7 @@ exports.save = function(req, res, next) {
     TemplateModel.findById(templateId, function(err, _data) {
 
         var tagData = _data.tagData;
+        
         var hasTagData = 0;
     
         for (var i = tagData.length; i--;) {

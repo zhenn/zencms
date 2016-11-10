@@ -1,33 +1,47 @@
 <%= include('../public/header') %>
 <%= include('../public/leftbar') %>
-<h2 class="title">编辑数据-<%= data.name %></h2>
+<h2 class="title">编辑数据 - <%= data.name %></h2>
 <div class="page-edit" data-templateId="<%= data.id %>">
     <ul class="list">
         <%
             taglist.forEach(function(item, i) {
         %>
         <li data-row="<%= item.row %>" data-default-row="<%= item.defaultRow %>">
-            <h3 class="tagNames" data-tagname="<%= item.name %>"><%= item.name %><span class="tips">（默认<%= item.defaultRow %>行，最多<%= item.row %>行）</span></h3>
+            <h3 class="tagNames" data-tagname="<%= item.name %>"><%= item.name %>  - <%= item.alias %><span class="tips">（默认<%= item.defaultRow %>行，最多<%= item.row %>行）</span></h3>
             <div class="datas">
                 
                 <%
                     for (var j = 0; j < item.data.length; j++) {
                         var v = item.data[j];
+                        
                 %>
                 <div class="erow">
+                    <div class="unit-list">
                     <%
                         
                         v.forEach(function(val, index) {
+                           
+                            <!-- print(JSON.stringify(val)) -->
                     %>
-                    <div class="unit"><span class="tit"><p class="field"><%= val.title %>:</span></p> <input type="text" data-field="<%= val.field %>" class="text" value="<%= val.value %>" /></div>
+                    <div class="unit"><span class="tit" data-tit="<%= val.title %>"><p class="field"><%= val.title %>:</p></span> <input type="text" data-field="<%= val.field %>" class="text" value="<%= val.value %>" /></div>
                     <%
                         });
                     %>
-                    <div class="act">
-                        <button class="btn btn-sm delrow" <% if(item.data.length <= item.defaultRow) {print('style="display:none;"')} %>>
+                    </div>
+                    <div class="act" <% if(item.data.length <= item.defaultRow) { print('style="display:none;"')} %> >
+                        <button class="btn btn-sm delrow" >
                             <i class="glyphicon glyphicon-trash"></i>
                             删除
                         </button>
+                         <button class="btn btn-sm downrow">
+                            <i class="glyphicon glyphicon-arrow-down"></i>
+                            下移
+                        </button>
+                        <button class="btn btn-sm uprow">
+                            <i class="glyphicon glyphicon-arrow-up"></i>
+                            上移
+                        </button>
+                       
                     </div>
                 </div>
                 <%
@@ -74,15 +88,18 @@
     margin-top: 15px;
 }
 .erow {
-    /*border-bottom: 1px dashed #d7d7d7;*/
-    width: 95%;
+    border-top: 1px solid #d7d7d7;
+    width: 96%;
     margin: 5px auto;
-    padding-bottom: 5px;
+    padding: 5px 0 10px;
     overflow: hidden;
     position: relative;
 }
 .erow.light {
-    background: #f7f7f7;
+   /* background: #f7f7f7;*/
+}
+.erow .unit-list{
+    width: 78%;
 }
 .erow .unit {
     width: 33%;
@@ -92,43 +109,44 @@
     margin-top: 2px;
 }
 .erow .unit .field {
-    margin: 0 0 0 3px;
+    margin: 0 0 5px 5px;
 }
 .title {
     padding-bottom: 10px;
     margin: 0 auto;
 }
 .page-edit .list li {
-   border: 1px solid #919191;
+   border: 1px solid #ddd;
    width: 100%;
+   border-radius: 4px;
    margin: 0 auto 10px;
    padding-bottom: 10px;
 
 }
+.act{
+    padding-top: 25px;
+}
+.act button{
+    float: right;
+    margin-left: 5px;
+}
+.act button:hover{
+    background: #888;
+}
 
-.delrow {
-    background: #9d9d9c;
-    border: 0 none;
-    position: absolute;
-    right: 0;
-    top: 50%;
-    margin-top: -14px;
-}
-.delrow:hover{
-    background: #9d9d9c;
-}
 .page-edit .datas .text {
     width: 195px;
     border: 1px solid #717171;
-    border-radius: 5px;
-    height: 25px;
-    line-height: 25px;
+    height: 30px;
+    line-height: 30px;
     color: #999;
     padding-left: 5px;
     margin-left: 5px;
 }    
 .tagNames {
     font-size: 20px;
+    padding-left: 20px;
+    padding-bottom: 10px;   
 }
 .tagNames .tips {
     font-size: 16px;
@@ -162,8 +180,8 @@
                 }
                 data.push({
                     field: input.attr('data-field'),
-                    title: tit.html(),
-                    value: input.val()
+                    title: tit.attr('data-tit'),
+                    value: input.val().trim()
                 });
             });
             datas.push(data);
@@ -240,7 +258,7 @@
         }
 
         if (li.find('.erow').length > li.attr('data-default-row')) {
-            li.find('.delrow').show();
+            li.find('.act').show();
         }
     });
 
@@ -255,11 +273,45 @@
         var addedErow = li.find('.erow');
 
         if (defaultRow == addedErow.length) {
-            li.find('.delrow').hide();
+            li.find('.act').hide();
         }
 
         if (addedErow.length < row) {
             li.find('.add').show();
+        }
+    });
+
+    // 上移一行
+    $('.page-edit').on('click', '.uprow', function(e){
+        var el = $(e.currentTarget);
+        var li = el.parents('li');
+        var rows = li.find('.erow');
+        var currentErow = el.parents('.erow');
+        var index = currentErow.index();
+
+        if (index == 0) {
+            alert('已经到顶部了');
+        } else {
+            index--;
+            currentErow.clone(true).insertBefore(rows[index]);
+            currentErow.remove();
+        }
+    })
+
+    // 下移一行
+    $('.page-edit').on('click', '.downrow', function(e){
+        var el = $(e.currentTarget);
+        var li = el.parents('li');
+        var rows = li.find('.erow');
+        var currentErow = el.parents('.erow');
+        var index = currentErow.index();
+        
+        if (index == rows.length - 1 ) {
+            alert('已经到底部了');
+        } else {
+            index++;
+            currentErow.clone(true).insertAfter(rows[index]);
+            currentErow.remove();
         }
     });
 

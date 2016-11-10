@@ -1,9 +1,5 @@
-<%= include('./public/header') %>
-<%= include('./public/leftbar') %>
-<link rel="stylesheet" type="text/css" href="/css/global.css">
 <div class="z-exception">
 	<h2><%= message %></h2>
 	<p class="status"><%= error.status %></p>
 	<div class="stack"><%= error.stack %></div>
 </div>
-<%= include('./public/footer') %>

@@ -15,10 +15,10 @@ var TemplateSchema = new Schema({
     link: String, // 线上地址
     // tagData: [  
     //     {
-    //         name: '文本链接',
+    //         name: '自定义表情',
     //         id: 'xxx', 
     //         type: 'custom', 
-            
+    //         alias: 'whatever',  // 用于module输出json给js异步使用, page中无用
     //         data: [[{ 
     //             field: 'pic', 
     //             title: '图片', 
@@ -46,8 +46,9 @@ function cmsTagIdHandler(content) {
     
     content = content.replace(cmsTagReg, function(a, b, c) {
         var result = a;
+        var randomNumber = Math.floor(Math.random() * 10000);
         if (!b.match(tagIdReg)) {
-            result = b + ' id="' + md5.hex_md5(new Date().getTime().toString()) + '">';
+            result = b + ' id="' + md5.hex_md5((new Date().getTime() + randomNumber).toString()) + '">';
         }
         return result;
     })
@@ -97,72 +98,80 @@ function getDefaultTagDataByTemplate(fields, defaultRow) {
  *      ]
  */
 TemplateSchema.methods.getTagList = function(tempContent, tagData) {
+
+   
     var tagreg = /<cms:[\s\S]+?<\/cms>/gi;
     var results = [];
     var matchResult = tempContent.match(tagreg);
-    
-    matchResult && matchResult.forEach(function(item, i) {
-        var nameMatch = item.match(/name="(.*?)"/i),
-            idMatch = item.match(/id="(.*?)"/i),
-            typeMatch = item.match(/cms:(.*?) /i),
-            fieldsMatch = item.match(/fields="(.*?)"/i),
-            defaultRowMatch = item.match(/defaultRow="(.*?)"/i),
-            rowMatch = item.match(/row="(.*?)"/i),
-            data, 
-            hasEditedData = false;
+    try {
+        matchResult && matchResult.forEach(function(item, i) {
+            var nameMatch = item.match(/name="(.*?)"/i),
+                idMatch = item.match(/id="(.*?)"/i),
+                typeMatch = item.match(/cms:(.*?) /i),
+                fieldsMatch = item.match(/fields="(.*?)"/i),
+                defaultRowMatch = item.match(/defaultRow="(.*?)"/i),
+                rowMatch = item.match(/row="(.*?)"/i),
+                aliasMatch = item.match(/alias="(.*?)"/i),
+                data, 
+                hasEditedData = false;
 
-        
-        var name = '系统默认-标签名称';
-        if (nameMatch && nameMatch[1]) {
-            name = nameMatch[1];
-        }
-        var id = idMatch[1];
-        var type = typeMatch[1];
-        var fields = fieldsMatch[1];
-        var defaultRow = 1;
-        var row = 1;
-
-        if (defaultRowMatch && defaultRowMatch[1]) {
-            defaultRow = parseInt(defaultRowMatch[1]);
-        }
-
-        if (rowMatch && rowMatch[1]) {
-            row = parseInt(rowMatch[1]);
-        }
-
-        if (defaultRow > row) {
-            defaultRow = row;
-        }
-
-        for (var j = tagData.length; j--;) {
-            var val = tagData[j];
-            if (val.id == id) {
-                hasEditedData = true;
-                data = _.clone(val).data || getDefaultTagDataByTemplate(fields, defaultRow);
+            
+            var name = '系统默认-标签名称';
+            if (nameMatch && nameMatch[1]) {
+                name = nameMatch[1];
             }
-        }
+            var id = idMatch && idMatch[1];
+            var type = typeMatch && typeMatch[1];
+            var fields = fieldsMatch && fieldsMatch[1];
+            var defaultRow = 1;
+            var row = 1;
+            var alias = aliasMatch && aliasMatch[1];
 
-        if (!hasEditedData) {
-            data = getDefaultTagDataByTemplate(fields, defaultRow);
-        }
-        
-        results.push({
-            name: name,
-            id: id,
-            type: type,
-            data: data,
-            defaultRow: defaultRow,
-            row: row
+            if (defaultRowMatch && defaultRowMatch[1]) {
+                defaultRow = parseInt(defaultRowMatch[1]);
+            }
+            // console.log(rowMatch)
+            if (rowMatch && rowMatch[1]) {
+                row = parseInt(rowMatch[1]);
+            }
+
+            if (defaultRow > row) {
+                defaultRow = row;
+            }
+
+            for (var j = tagData.length; j--;) {
+                var val = tagData[j];
+                if (val.id == id) {
+                    hasEditedData = true;
+                    data = _.clone(val).data || getDefaultTagDataByTemplate(fields, defaultRow);
+                }
+            }
+
+            if (!hasEditedData) {
+                data = getDefaultTagDataByTemplate(fields, defaultRow);
+            }
+            
+            results.push({
+                name: name,
+                id: id,
+                type: type,
+                data: data,
+                defaultRow: defaultRow,
+                row: row,
+                alias: alias
+            });
+
         });
-
-    });
+    } catch (e) {
+        console.log('\n\n');
+        console.log(e);
+        console.log('\n\n');
+    }
+    
 
     return results;
 };
 
-TemplateSchema.methods.getGroupName = function(group) {
-    return require('../../config/groupmap.json')[group];
-};
 
 TemplateSchema.methods.getTemplateTypeName = function(type) {
     var templateTypeMap = {
@@ -178,7 +187,6 @@ TemplateSchema.methods.setAlias = function() {
         lastModifyTime = this.lastModifyTime ? times.format(this.lastModifyTime) : '';
     this.setValue('createTime', createTime);
     this.setValue('lastModifyTime', lastModifyTime);
-    this.setValue('group', this.getGroupName(this.group));
     this.setValue('type', this.getTemplateTypeName(this.type));
 }
 

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN" xml:lang="zh-CN">
+<head>
+<title><%= title %></title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+<meta name="format-detection" content="telephone=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<style type="text/css">
+    * {
+        padding: 0;
+        margin: 0;
+    }
+    ol, ul {
+        list-style-type: none;
+    }
+    img {
+        display: block;
+        margin: 0 auto;
+        <%
+            if (imgAdaptScreen) {
+        %>
+        width: 100%!important;
+        <%
+            }
+        %>
+    }
+    .wrap {
+        width: <%= widthRate %>%;
+        margin: 0 auto;
+    }
+    @media (min-width: 1024px) {
+        body {
+            max-width: 640px;
+            margin: 0 auto;
+        }
+    }
+</style>
+</head>
+
+<body>
+<div class="wrap"><%= content %></div>
+</body>
+</html>
+
